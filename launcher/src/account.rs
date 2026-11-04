@@ -424,7 +424,10 @@ pub struct Account {
     /// The profile UUID without dashes.
     pub uuid: String,
     pub name: String,
-    /// The active skin's URL (textures.minecraft.net) and model ("classic" or "slim").
+    /// Account type / provider (Microsoft, Elyby)
+    #[serde(default)]
+    pub provider: Option<String>,
+    /// The active skin's URL (textures.minecraft.net or skinsystem.ely.by) and model ("classic" or "slim").
     #[serde(default)]
     pub skin: Option<(String, String)>,
     #[serde(default)]
@@ -459,6 +462,7 @@ fn profile(ep: &Endpoints, token: &str) -> Result<Option<Account>, String> {
     Ok(Some(Account {
         uuid: uuid.replace('-', "").to_lowercase(),
         name,
+        provider: Some("microsoft".into()),
         skin: active("skins").and_then(|s| {
             Some((
                 str_field(&s, "url")?,

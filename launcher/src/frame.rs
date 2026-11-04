@@ -680,7 +680,8 @@ impl Launcher {
                                         let account = crate::account::Account {
                                             uuid: uuid.clone(),
                                             name: username.clone(),
-                                            skin: None,
+                                            provider: Some("elyby".into()),
+                                            skin: Some((format!("http://skinsystem.ely.by/textures/{username}"), "classic".into())),
                                             cape: None,
                                         };
                                         let secrets = crate::account::Secrets {
