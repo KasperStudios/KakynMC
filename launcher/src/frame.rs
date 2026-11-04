@@ -674,13 +674,28 @@ impl Launcher {
                             cx.open_url(&flow.auth_url);
                             std::thread::spawn(move || {
                                 if let Ok(code) = crate::elyby::ElybyFlow::wait_for_code(listener) {
-                                    if let Ok((username, _uuid, _token)) = crate::elyby::ElybyFlow::exchange(&code, &flow.verifier, flow.port) {
+                                    if let Ok((username, uuid, token)) = crate::elyby::ElybyFlow::exchange(&code, &flow.verifier, flow.port) {
+                                        let store = crate::account::store();
                                         let mut accounts = crate::account::Accounts::load();
-                                        let _ = accounts.add_offline(&username);
-                                        accounts.selected = None;
-                                        accounts.offline_selected = Some(username);
+                                        let account = crate::account::Account {
+                                            uuid: uuid.clone(),
+                                            name: username.clone(),
+                                            skin: None,
+                                            cape: None,
+                                        };
+                                        let secrets = crate::account::Secrets {
+                                            refresh_token: String::new(),
+                                            sign_in_required: false,
+                                            minecraft_token: token,
+                                            minecraft_expires_at: u64::MAX,
+                                            xuid: None,
+                                            owns: true,
+                                        };
+                                        let _ = accounts.keep_sign_in(store, account, &secrets);
+                                        accounts.selected = Some(uuid);
                                         let _ = accounts.save();
                                         let _ = tx.send(crate::backend::Msg::AccountsReloaded);
+                                        crate::glass_toast::say(format!("Signed in as {username} via Ely.by!"));
                                     }
                                 }
                             });

@@ -474,18 +474,15 @@ fn profile(ep: &Endpoints, token: &str) -> Result<Option<Account>, String> {
 /// What the keychain keeps for one account.
 #[derive(Clone, serde::Serialize, serde::Deserialize)]
 pub struct Secrets {
-    refresh_token: String,
+    pub refresh_token: String,
     #[serde(default)]
-    sign_in_required: bool,
-    minecraft_token: String,
-    minecraft_expires_at: u64,
+    pub sign_in_required: bool,
+    pub minecraft_token: String,
+    pub minecraft_expires_at: u64,
     #[serde(default)]
-    xuid: Option<String>,
-    /// The last answer the Minecraft services gave: whether the account owns the game. It is
-    /// kept here, beside the tokens, so that no plain file can say yes. Accounts saved before it
-    /// existed passed the same check at sign-in, which refuses everyone else.
+    pub xuid: Option<String>,
     #[serde(default = "owned_at_sign_in")]
-    owns: bool,
+    pub owns: bool,
 }
 fn owned_at_sign_in() -> bool {
     true
@@ -1579,7 +1576,7 @@ impl Accounts {
         self.keep_sign_in(store, account, secrets)
     }
 
-    fn keep_sign_in(
+    pub fn keep_sign_in(
         &mut self,
         store: &dyn SecretStore,
         account: Account,
