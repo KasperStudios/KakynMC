@@ -763,9 +763,10 @@ impl Launcher {
             this.wardrobe_preview();
         }
         // What the game and the launcher kept, if the player allows it and there is a server.
-        telemetry::send_in_background();
-        telemetry::watch_playing(this.tx.clone());
-        telemetry::watch_official(this.tx.clone());
+        // [KakynMC]: Disable constant background network pings and telemetry to stop stuttering
+        // telemetry::send_in_background();
+        // telemetry::watch_playing(this.tx.clone());
+        // telemetry::watch_official(this.tx.clone());
         this
     }
 

@@ -46,8 +46,8 @@ const STAR_WARM: u32 = 0xfff3e4;
 const MARGIN: i32 = 20;
 /// The mockup's sun: right of centre, a little bigger and higher (`wideSun`), on wide windows.
 const WIDE_SUN: (f64, f64, f64) = (0.72, 1.1, 0.1);
-/// The website draws a frame when 31 ms have passed since the last.
-const TICK: Duration = Duration::from_millis(31);
+// [KakynMC]: Throttle background animation tick from 31ms (30fps constant waking) to 100ms
+const TICK: Duration = Duration::from_millis(100);
 /// How long the scene keeps moving after the window loses focus.
 const UNFOCUSED: Duration = Duration::from_secs(10);
 

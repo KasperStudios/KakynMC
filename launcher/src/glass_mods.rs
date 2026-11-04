@@ -65,6 +65,36 @@ impl Launcher {
         .mb_0();
         let open = self.mods.kind;
         let mut tabs = div().flex().flex_none().items_center().gap(px(4.));
+        // [KakynMC Modport Button]
+        let port_btn = small_tab(
+            SharedString::from("mods-tab-modport"),
+            false,
+            &t,
+        )
+        .bg(gpui::rgb(0x7c3aed))
+        .child("⚡ Port Java .JAR")
+        .on_click(cx.listener(|_this, _: &ClickEvent, _, _cx| {
+            std::thread::spawn(|| {
+                // Open file chooser via zenity / kdialog or launch modport
+                let _ = std::process::Command::new("zenity")
+                    .args(["--file-selection", "--title=Select Minecraft Java Mod (.jar)", "--file-filter=*.jar"])
+                    .output()
+                    .ok()
+                    .and_then(|out| {
+                        let path_str = String::from_utf8_lossy(&out.stdout).trim().to_string();
+                        if !path_str.is_empty() {
+                            let _ = std::process::Command::new("python3")
+                                .arg("/home/kasperenok/Desktop/projects/kakynmc/modport/main.py")
+                                .arg(&path_str)
+                                .arg("--agent")
+                                .spawn();
+                        }
+                        Some(())
+                    });
+            });
+        }));
+        tabs = tabs.child(port_btn);
+
         for (kind, label, _) in KINDS {
             tabs = tabs.child(
                 small_tab(
