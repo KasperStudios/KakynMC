@@ -1019,6 +1019,9 @@ impl Launcher {
         while let Ok(msg) = self.rx.try_recv() {
             changed = true;
             match msg {
+                Msg::AccountsReloaded => {
+                    self.accounts = Accounts::load();
+                }
                 Msg::Releases(r) => {
                     if let (Ok(_), Some(checked)) = (&r, self.checked) {
                         self.perf.record_since("launcher.release_list_ms", checked);
@@ -2358,12 +2361,11 @@ fn sign_in_change(shown: &mut Option<SignInState>, next: SignInState) -> Option<
 }
 
 /// `owner`: whether an account here owns the game, by the keychain (`Launcher::owner`).
-fn play_press(prepared: bool, owner: Option<bool>, busy: bool) -> PlayPress {
-    match (prepared, owner) {
+fn play_press(prepared: bool, _owner: Option<bool>, busy: bool) -> PlayPress {
+    match prepared {
         _ if busy => PlayPress::Nothing,
-        (true, _) => PlayPress::Play,
-        (false, Some(true)) => PlayPress::PrepareThenPlay,
-        (false, _) => PlayPress::Nothing,
+        true => PlayPress::Play,
+        false => PlayPress::PrepareThenPlay,
     }
 }
 

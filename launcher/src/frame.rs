@@ -669,6 +669,7 @@ impl Launcher {
                             .child("Sign in with Ely.by"),
                     )
                     .on_click(cx.listener(|this, _: &ClickEvent, _, cx| {
+                        let tx = this.tx.clone();
                         if let Ok((flow, listener)) = crate::elyby::ElybyFlow::new() {
                             cx.open_url(&flow.auth_url);
                             std::thread::spawn(move || {
@@ -679,6 +680,7 @@ impl Launcher {
                                         accounts.selected = None;
                                         accounts.offline_selected = Some(username);
                                         let _ = accounts.save();
+                                        let _ = tx.send(crate::backend::Msg::AccountsReloaded);
                                     }
                                 }
                             });
