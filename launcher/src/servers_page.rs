@@ -1319,7 +1319,7 @@ impl Launcher {
         }
         // The banner, with a "Hide" once it has been on screen a while: hiding it hides the
         // sidebar's card too, for good. Nothing at all once hidden.
-        let partner = (!self.settings.partner_hidden).then(|| {
+        let partner = (false && !self.settings.partner_hidden).then(|| {
             let mut slot = div().relative().w(px(600.)).child(super::partner::banner(
                 "partner-servers",
                 600.,
