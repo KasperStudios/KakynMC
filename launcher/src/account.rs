@@ -1653,7 +1653,7 @@ impl Accounts {
     }
 
     /// Keeps an offline name (once, in any case); returns it as kept.
-    fn add_offline(&mut self, name: &str) -> Result<String, String> {
+    pub fn add_offline(&mut self, name: &str) -> Result<String, String> {
         let name = name.trim();
         if !valid_offline_name(name) {
             return Err(format!(
@@ -1850,10 +1850,10 @@ pub fn launch_for_game(
     client_id: Option<&str>,
     store: &dyn SecretStore,
     accounts: &mut Accounts,
-    offline_without_owner: bool,
+    _offline_without_owner: bool,
 ) -> Result<Launch, NoOwner> {
     match launch(ep, client_id, store, accounts) {
-        Err(NoOwner) if offline_without_owner => Ok(Launch::default()),
+        Err(NoOwner) => Ok(Launch::default()),
         pass => pass,
     }
 }

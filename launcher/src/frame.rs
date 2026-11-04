@@ -649,6 +649,45 @@ impl Launcher {
                 &t,
             )
         });
+        let elyby_sign_in = self.accounts.selected().is_none().then(|| {
+            keyboard(
+                div()
+                    .id("topbar-elyby-sign-in")
+                    .relative()
+                    .flex()
+                    .items_center()
+                    .gap(px(10.))
+                    .h(px(44.))
+                    .px(px(16.))
+                    .rounded(px(radius::ROW))
+                    .bg(gpui::rgb(0x40a02b))
+                    .hover(|s| s.bg(gpui::rgb(0x52b63b)))
+                    .cursor_pointer()
+                    .child(
+                        ui::text(14., FontWeight::MEDIUM, ink::FULL)
+                            .text_color(gpui::white())
+                            .child("Sign in with Ely.by"),
+                    )
+                    .on_click(cx.listener(|this, _: &ClickEvent, _, cx| {
+                        if let Ok((flow, listener)) = crate::elyby::ElybyFlow::new() {
+                            cx.open_url(&flow.auth_url);
+                            std::thread::spawn(move || {
+                                if let Ok(code) = crate::elyby::ElybyFlow::wait_for_code(listener) {
+                                    if let Ok((username, _uuid, _token)) = crate::elyby::ElybyFlow::exchange(&code, &flow.verifier, flow.port) {
+                                        let mut accounts = crate::account::Accounts::load();
+                                        let _ = accounts.add_offline(&username);
+                                        accounts.selected = None;
+                                        accounts.offline_selected = Some(username);
+                                        let _ = accounts.save();
+                                    }
+                                }
+                            });
+                        }
+                        cx.notify();
+                    })),
+                &t,
+            )
+        });
         let settings = ui::icon_button(
             "nav-Settings",
             "sliders-horizontal",
@@ -705,6 +744,7 @@ impl Launcher {
                     .gap(px(6.))
                     .children(build_log)
                     .child(account)
+                    .children(elyby_sign_in)
                     .children(sign_in)
                     .child(settings),
             )
